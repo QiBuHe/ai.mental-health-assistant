@@ -9,5 +9,4 @@ public class AiMhaApplication {
     public static void main(String[] args) {
         SpringApplication.run(AiMhaApplication.class, args);
     }
-
 }
