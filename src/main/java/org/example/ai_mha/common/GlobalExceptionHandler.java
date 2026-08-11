@@ -1,15 +1,14 @@
 package org.example.ai_mha.common;
 
-import jakarta.validation.Valid;
+import org.example.ai_mha.exception.BusinessException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import java.util.stream.Collectors;
 
 @RestControllerAdvice
-public class GlobarExceptionHandler {
+public class GlobalExceptionHandler {
 
     //处理参数校验异常
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -21,4 +20,16 @@ public class GlobarExceptionHandler {
         return Result.error(ResultCode.PARAM_ERROR.getCode(), ResultCode.PARAM_MISSING.getMsg(), message);
     }
 
+    //处理业务异常
+    @ExceptionHandler(BusinessException.class)
+    public Result<?> handlerException(BusinessException e){
+        //如果异常携带额外的数据
+        if(e.getData() != null){
+            return Result.error(e.getCode(), e.getMessage(), e.getData());
+        }
+        //如果异常没有携带额外的数据
+        else{
+            return Result.error(e.getCode(), e.getMessage(),null);
+        }
+    }
 }
