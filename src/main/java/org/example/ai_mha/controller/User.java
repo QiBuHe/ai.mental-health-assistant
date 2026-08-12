@@ -13,13 +13,10 @@ import org.example.ai_mha.mapper.UserMapper;
 import org.example.ai_mha.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/user")
+@RequestMapping("/api/User")
 //用户登录接口
 public class User {
     @Resource
@@ -35,7 +32,13 @@ public class User {
 //用户注册接口
     @PostMapping("/add")
     public Result<UserLoginResponseDTO.UserDetailResponseDTO> register(@Valid @RequestBody UserRegisterCommandDTO commandDTO){
+        UserLoginResponseDTO.UserDetailResponseDTO result = userService.register(commandDTO);
 
+        return Result.success(result);
+    }
+    //获取当前用户
+    @GetMapping("/current")
+    public Result<UserLoginResponseDTO.UserDetailResponseDTO> getCurrentUser(){
 
         return null;
     }

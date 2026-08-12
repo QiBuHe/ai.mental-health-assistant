@@ -85,8 +85,17 @@ public class UserService {
             String password = commandDTO.getPassword().trim();
             String encodedPassword = passwordEncoder.encode(password);
 
+            User user = UserConvert.registerCommandToEntity(commandDTO,encodedPassword);
+            //插入数据库
             userMapper.insert(user);
-            return null;
+            return UserConvert.entityToDetailResponse(user);
+        }
+        public UserLoginResponseDTO.UserDetailResponseDTO getUserById(Long userid) {
+        User user = userMapper.selectById(userid);
+            if(user == null){
+                throw new BusinessException("用户不存在");
+            }
+            return UserConvert.entityToDetailResponse(user);
         }
 }
 
