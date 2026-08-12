@@ -6,6 +6,7 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTCreationException;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
+import jakarta.servlet.ServletRequestAttributeEvent;
 import lombok.Getter;
 import org.springframework.util.StringUtils;
 import jakarta.servlet.http.HttpServletRequest;
@@ -13,6 +14,8 @@ import org.example.ai_mha.config.JwtConfig;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Component;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.util.Date;
 @Component
@@ -63,6 +66,22 @@ public class JwtTokenUtil implements ApplicationContextAware {
             return tokenHeader;
         }
         return null;
+    }
+
+    //获取当前的token
+    public static String getCurrentToken(){
+        ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        if(attributes!=null){
+            HttpServletRequest request = attributes.getRequest();
+            String token =(String) request.getAttribute("jwtToken");
+            if(token != null){
+                return token;
+            }
+            //从请求头
+            String headToken = extractTokenFromRequest(request);
+            return token;
+        }
+return null;
     }
 
     //验证token

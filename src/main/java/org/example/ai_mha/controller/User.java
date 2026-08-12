@@ -1,6 +1,7 @@
 package org.example.ai_mha.controller;
 
 import cn.hutool.json.JSONUtil;
+import com.auth0.jwt.interfaces.DecodedJWT;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
@@ -11,6 +12,7 @@ import org.example.ai_mha.common.Result;
 import org.example.ai_mha.enumClass.UserType;
 import org.example.ai_mha.mapper.UserMapper;
 import org.example.ai_mha.service.UserService;
+import org.example.ai_mha.util.JwtTokenUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
@@ -23,6 +25,8 @@ public class User {
     private UserService userService;
     @Autowired
     private UserMapper userMapper;
+    @Autowired
+    private JwtTokenUtil jwtTokenUtil;
 
     @PostMapping("/login")
         public Result<UserLoginResponseDTO> login(@Valid @RequestBody UserLoginCommandDTO commandDTO){
@@ -39,8 +43,12 @@ public class User {
     //获取当前用户
     @GetMapping("/current")
     public Result<UserLoginResponseDTO.UserDetailResponseDTO> getCurrentUser(){
+        String token = JwtTokenUtil.getCurrentToken();
+        DecodedJWT jwt = JwtTokenUtil.verifyToken(token);
+        Long userId = jwt.getClaim("userId").asLong();
+        //调用Serice层方法获取用户信息
+        UserLoginResponseDTO.UserDetailResponseDTO result = userService.getUserById(userId);
 
-        return null;
+        return Result.success(result);
     }
-
 }
