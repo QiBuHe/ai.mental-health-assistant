@@ -1,7 +1,10 @@
 package org.example.ai_mha.service.convert;
 
+import org.example.ai_mha.DTO.command.UserRegisterCommandDTO;
 import org.example.ai_mha.DTO.response.UserLoginResponseDTO;
 import org.example.ai_mha.entity.User;
+import org.example.ai_mha.enumClass.UserStatus;
+import java.time.LocalDateTime;
 
 public class UserConvert {
     /**
@@ -30,13 +33,15 @@ public class UserConvert {
                 .build();
     }
 
+
+
     /**
      * 构建登录响应DTO
      * @param token JWT令牌
      * @param userInfo 用户信息
      * @return 登录响应DTO
      */
-    public static UserLoginResponseDTO buildLoginResponse(String token, UserLoginResponseDTO.UserDetailResponseDTO userInfo) {
+    public static UserLoginResponseDTO entityToLoginResponse(String token, UserLoginResponseDTO.UserDetailResponseDTO userInfo) {
         return UserLoginResponseDTO.builder()
                 .userInfo(userInfo)
                 .token(token)
@@ -44,6 +49,22 @@ public class UserConvert {
                 .build();
     }
 
+
+    public static User registerCommandToEntity(UserRegisterCommandDTO commandDTO, String encodedPassword) {
+        return User.builder()
+                .username(commandDTO.getUsername())
+                .password(encodedPassword)
+                .email(commandDTO.getEmail())
+                .nickname(commandDTO.getNickname())
+                .phone(commandDTO.getPhone())
+                .gender(commandDTO.getGender())
+                .birthday(commandDTO.getBirthday())
+                .userType(commandDTO.getUserType())
+                .status(UserStatus.NORMAL.getCode())
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
+                .build();
+    }
     /**
      * 获取性别显示名称
      * @param gender 性别代码

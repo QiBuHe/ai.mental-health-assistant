@@ -19,7 +19,8 @@ public class SecurityConfig {
     private static final String[] PUBLIC_PATHS={
             "/",
             "/api/test",
-            "api/user/login"
+            "api/User/login",
+            "api/User/add"
     };
 
     @Bean

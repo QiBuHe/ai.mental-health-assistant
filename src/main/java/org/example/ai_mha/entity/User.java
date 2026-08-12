@@ -1,5 +1,6 @@
 package org.example.ai_mha.entity;
 
+// 用户实体类
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -8,21 +9,17 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import org.example.ai_mha.enumClass.UserStatus;
+import org.example.ai_mha.enumClass.UserType;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-// 用户实体类
 @Data
-@TableName("user")
+@TableName("User")
 @Builder
-@NoArgsConstructor
-@AllArgsConstructor
 public class User {
     // 用户ID
     @TableId(type = IdType.AUTO)
@@ -77,53 +74,52 @@ public class User {
     @TableField("updated_at")
     private LocalDateTime updatedAt;
 
-    /**
-     * 是否为普通用户
-     */
+//    /**
+//     * 是否为普通用户
+//     */
 //    public boolean isUser() {
 //        return UserType.USER.getCode().equals(this.userType);
 //    }
 
     /**
      * 是否为正常状态
-   */
+     */
     public boolean isActive() {
         return UserStatus.NORMAL.getCode().equals(this.status);
     }
-
-    /**
-     * 是否被禁用
-     */
+//
+//    /**
+//     * 是否被禁用
+//     */
 //    public boolean isDisabled() {
 //        return UserStatus.DISABLED.getCode().equals(this.status);
 //    }
-
+//
     /**
      * 获取显示名称（优先显示昵称，否则显示用户名）
      */
-//    public String getDisplayName() {
-//        return nickname != null && !nickname.trim().isEmpty() ? nickname : username;
-//    }
+    public String getDisplayName() {
+        return nickname != null && !nickname.trim().isEmpty() ? nickname : username;
+    }
 
     /**
      * 获取用户类型显示名称
      */
-//    public String getUserTypeDisplayName() {
-//        try {
-//            return UserType.fromCode(userType).getDescription();
-//        } catch (IllegalArgumentException e) {
-//            return "未知";
-//        }
-//    }
-
+    public String getUserTypeDisplayName() {
+        try {
+            return UserType.fromCode(userType).getDescription();
+        } catch (IllegalArgumentException e) {
+            return "未知";
+        }
+    }
     /**
      * 获取用户状态显示名称
      */
-//    public String getStatusDisplayName() {
-//        try {
-//            return UserStatus.fromCode(status).getDescription();
-//        } catch (IllegalArgumentException e) {
-//            return "未知";
-//        }
-//    }
+    public String getStatusDisplayName() {
+        try {
+            return UserStatus.fromCode(status).getDescription();
+        } catch (IllegalArgumentException e) {
+            return "未知";
+        }
+    }
 }
