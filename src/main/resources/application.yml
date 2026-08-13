@@ -1,14 +1,23 @@
 spring:
   profiles:
     active: local
+  main:
+    allow-bean-definition-overriding: true
+  ai:
+    openai:
+      base-url: https://api.siliconflow.cn
+      chat:
+        options:
+          model: deepseek-ai/DeepSeek-V3
+          tool-calling:
+            enabled: true
+        completions-path: /v1/chat/completions
 server:
   port: 8080
-
 # JWT配置
 jwt:
   secret: MySecretKeyForJWT2025!@#$%^&*()_+SecureKeyHere
-  expiration: 86400000  # 24小时（毫秒）
-  refresh-expiration: 604800000  # 7天（毫秒）
-  header: Authorization  # token头部名称
-  token-prefix: "Bearer "  # token前缀
-
+  expiration: 86400000
+  refresh-expiration: 604800000
+  header: Authorization
+  token-prefix: "Bearer "

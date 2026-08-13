@@ -1,5 +1,7 @@
 package org.example.ai_mha.service;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import org.example.ai_mha.DTO.response.ConsultationMessageResponseDTO;
 import org.example.ai_mha.entity.ConsultationMessage;
 import org.example.ai_mha.entity.ConsultationSession;
 import org.example.ai_mha.mapper.ConsultationMessageMapper;
@@ -7,6 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+
+import static net.sf.jsqlparser.parser.feature.Feature.orderBy;
 
 @Service
 public class ConsultationMessageService {
@@ -25,5 +29,65 @@ public class ConsultationMessageService {
 
         consultationMessageMapper.insert(userMessage);
         return userMessage;
+    }
+
+    public ConsultationMessage saveAiMassage(Long sessionId, String content, String aiModel){
+        ConsultationMessage Message = ConsultationMessage.builder()
+                .sessionId(sessionId)
+                .senderType(2)
+                .messageType(1)
+                .content(content)
+                .aiModel(aiModel)
+                .createdAt(LocalDateTime.now())
+                .build();
+
+        //插入数据库
+        consultationMessageMapper.insert(Message);
+        return Message;
+    }
+
+    public Integer getMessageCountBySession(Long sessionId){
+        LambdaQueryWrapper<ConsultationMessage> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(ConsultationMessage::getSessionId, sessionId);
+
+        Long count = consultationMessageMapper.selectCount(queryWrapper);
+        return count.intValue();
+    }
+
+    //获取会话的最后一条消息
+    public ConsultationMessageResponseDTO getLastMessageBySessionId(Long sessionId){
+        LambdaQueryWrapper<ConsultationMessage> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(ConsultationMessage::getSessionId, sessionId)
+                .orderByDesc(ConsultationMessage::getCreatedAt)
+                .last("Limit 1");
+        ConsultationMessage lastMessage = consultationMessageMapper.selectOne(queryWrapper);
+
+        return lastMessage != null ? convertToResponseDTO(lastMessage) : null;
+    }
+
+    private ConsultationMessageResponseDTO convertToResponseDTO(ConsultationMessage message) {
+        if (message == null) {
+            return null;
+        }
+
+        // 手动逐字段赋值，确保转换的准确性和可控性
+        ConsultationMessageResponseDTO responseDTO = new ConsultationMessageResponseDTO();
+        responseDTO.setId(message.getId());
+        responseDTO.setSessionId(message.getSessionId());
+        responseDTO.setSenderType(message.getSenderType());
+        responseDTO.setMessageType(message.getMessageType());
+        responseDTO.setContent(message.getContent());
+        responseDTO.setEmotionTag(message.getEmotionTag());
+        responseDTO.setAiModel(message.getAiModel());
+        responseDTO.setCreatedAt(message.getCreatedAt());
+
+        // 设置描述字段（通过实体方法获取）
+        responseDTO.setSenderTypeDesc(message.getSenderTypeDesc());
+        responseDTO.setMessageTypeDesc(message.getMessageTypeDesc());
+
+        // 计算消息长度
+        responseDTO.calculateContentLength();
+
+        return responseDTO;
     }
 }

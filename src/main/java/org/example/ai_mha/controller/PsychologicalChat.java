@@ -2,6 +2,7 @@ package org.example.ai_mha.controller;
 
 import cn.hutool.json.JSONUtil;
 import com.auth0.jwt.interfaces.DecodedJWT;
+import com.networknt.schema.SchemaLocation;
 import jakarta.validation.Valid;
 import org.example.ai_mha.AiService.PsychologicalSupportService;
 import org.example.ai_mha.AiService.StructOutPut;
@@ -18,6 +19,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Flux;
+
+import java.time.Duration;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/psychological-chat")
@@ -36,7 +40,7 @@ public class PsychologicalChat {
     }
 
     @PostMapping(value = "stream",produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public Flux<ServerSentEvent<String>> streamChat(@Valid @RequestBody ConsultationStreamDTO createDTO){
+    public Flux<ServerSentEvent<String>> streamChat(@Valid @RequestBody ConsultationStreamDTO streamDTO){
         String token = JwtTokenUtil.getCurrentToken();
         DecodedJWT jwt = JwtTokenUtil.verifyToken(token);
         Long userId = jwt.getClaim("userId").asLong();
@@ -48,7 +52,20 @@ public class PsychologicalChat {
                     .build());
         }
 
-        //开始留式对话
-        return null;
+        //开始流式对话
+        return psychologicalSupportService.streamPsychologicalChat(streamDTO.getSessionId(),streamDTO.getUserMessage())
+                .map(Fragment -> {
+            return ServerSentEvent.<String>builder()
+                            .event("message")
+                            .data(JSONUtil.toJsonStr(Result.success(Map.of("content",Fragment,"type","normal"))))
+                            .build();
+        })
+        .concatWith(Flux.just(ServerSentEvent.<String>builder()
+                        .event("done")
+                        .data("{}")
+                        .build()
+        ))
+        .delayElements(Duration.ofMillis(2));//确保流式输出的体验
+
     }
 }
