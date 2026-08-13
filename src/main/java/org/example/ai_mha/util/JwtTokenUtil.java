@@ -20,7 +20,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import java.util.Date;
 @Component
 public class JwtTokenUtil implements ApplicationContextAware {
-    private static final String ISSUER = "ai-mha";
+    private static final String ISSUER = "mental-health-assistant";
 
     private static ApplicationContext applicationContext;
 
@@ -79,7 +79,7 @@ public class JwtTokenUtil implements ApplicationContextAware {
             }
             //从请求头
             String headToken = extractTokenFromRequest(request);
-            return token;
+            return headToken;
         }
 return null;
     }
